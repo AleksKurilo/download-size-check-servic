@@ -1,9 +1,9 @@
 package com.oracle.DownloadSizeCheckService.service;
 
 
-import com.oracle.DownloadSizeCheckService.exception.NotFoundException;
 import com.oracle.DownloadSizeCheckService.dto.ComplexResourcesDto;
 import com.oracle.DownloadSizeCheckService.dto.SingleResourcesDto;
+import com.oracle.DownloadSizeCheckService.exception.NotFoundHeaderValueException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.pmw.tinylog.Logger;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class ResourcesSizeServiceImpl implements ResourcesSizeService {
 
     private final HttpHeaders requestHeaders = new HttpHeaders();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @PostConstruct
     public void init() {
@@ -58,26 +59,25 @@ public class ResourcesSizeServiceImpl implements ResourcesSizeService {
         }
 
         List<String> imageLinks = getImageLinks(document);
-        setCountImages(dto, imageLinks);
+        setSizeImages(dto, imageLinks);
         return dto;
     }
 
     private Long getResourcesSize(String path) {
         HttpEntity entity = new HttpEntity(requestHeaders);
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> response = restTemplate.exchange(path, HttpMethod.HEAD, entity, String.class);
 
         HttpHeaders responseHeaders = response.getHeaders();
         List<String> contentLengthHeaders = responseHeaders.get("Content-Length");
         if (contentLengthHeaders == null) {
             Logger.error("Request does not contains Content-Length header!");
-            throw new NotFoundException(path);
+            throw new NotFoundHeaderValueException(path);
         } else {
             return Long.valueOf(contentLengthHeaders.get(0));
         }
     }
 
-    private void setCountImages(ComplexResourcesDto dto, List<String> imageLinks) {
+    private void setSizeImages(ComplexResourcesDto dto, List<String> imageLinks) {
         int requestCount = dto.getRequestCount();
         long totalSize = dto.getTotalSize();
         Map<String, Long> images = new HashMap<>();
