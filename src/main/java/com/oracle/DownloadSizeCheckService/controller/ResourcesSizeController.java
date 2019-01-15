@@ -1,6 +1,6 @@
 package com.oracle.DownloadSizeCheckService.controller;
 
-import com.oracle.DownloadSizeCheckService.dto.ComplexResourcesDto;
+import com.oracle.DownloadSizeCheckService.dto.ResourcesSizeDto;
 import com.oracle.DownloadSizeCheckService.service.ResourcesSizeService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.URL;
@@ -17,7 +17,7 @@ public class ResourcesSizeController {
     private final ResourcesSizeService resourcesSizeService;
 
     @GetMapping(path = "/size")
-    public ComplexResourcesDto getSingleResourcesSize(@URL @RequestParam String path) {
+    public ResourcesSizeDto getSingleResourcesSize(@URL @RequestParam String path) {
         return resourcesSizeService.getComplexResourcesSize(path);
     }
 

@@ -7,11 +7,11 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ComplexResourcesDto {
+public class ExternalResourceDto {
 
-    private long totalSize;
+    private int size;
 
     private int requestCount;
 
-    private Map<String, Long> images;
+    private Map<String, Long> externalResources;
 }

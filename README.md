@@ -27,30 +27,10 @@ mvn clean install
 1. Request for a single HTML size
 
 ```
-GET: http://localhost:8080/singleResources/?path=<resource_path>
+GET: http://localhost:8080/singleResources/?path=<resource_url>
 ```
 
-format *<resource_path>*
-
-```
-https://www.google.com
-```
-
-Response example
-
-```
-{
-    "size": 70600
-}
-```
-
-2. Request for a complex HTML size
-
-```
-GET: http://localhost:8080/complexResources/?path=<resource_path>
-```
-
-format *<resource_path>*
+format *<resource_url>*
 
 ```
 https://www.google.com
@@ -60,9 +40,9 @@ Response example
 
 ```
 {
-    "totalSize": 84367,
+    "totalSize": 258700,
     "requestCount": 3,
-    "images": {
+    "externalResource": {
         "https://www.google.com/tia/tia.png": 258,
         "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png": 13504
     }
@@ -73,7 +53,7 @@ Response example
 
 **'requestCount'** is the total number of request executed to receive data.
 
-**'images'** are all images on the current page and their size
+**'externalResource'** are all images on the current page and their size
 
 
 ## Authors

@@ -1,8 +1,8 @@
 package com.oracle.DownloadSizeCheckService.service;
 
-import com.oracle.DownloadSizeCheckService.dto.ComplexResourcesDto;
+import com.oracle.DownloadSizeCheckService.dto.ResourcesSizeDto;
 
 public interface ResourcesSizeService {
 
-    ComplexResourcesDto getComplexResourcesSize(String path);
+    ResourcesSizeDto getComplexResourcesSize(String url);
 }
