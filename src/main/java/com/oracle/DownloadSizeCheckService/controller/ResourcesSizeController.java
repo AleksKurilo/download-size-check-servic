@@ -17,8 +17,8 @@ public class ResourcesSizeController {
     private final ResourcesSizeService resourcesSizeService;
 
     @GetMapping(path = "/size")
-    public ResourcesSizeDto getSingleResourcesSize(@URL @RequestParam String path) {
-        return resourcesSizeService.getComplexResourcesSize(path);
+    public ResourcesSizeDto getSingleResourcesSize(@URL @RequestParam String url) {
+        return resourcesSizeService.getComplexResourcesSize(url);
     }
 
 }

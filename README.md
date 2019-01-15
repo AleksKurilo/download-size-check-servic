@@ -27,7 +27,7 @@ mvn clean install
 1. Request for a single HTML size
 
 ```
-GET: http://localhost:8080/singleResources/?path=<resource_url>
+GET: http://localhost:8080/resources/size?url=<resource_url>
 ```
 
 format *<resource_url>*
