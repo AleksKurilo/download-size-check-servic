@@ -2,8 +2,7 @@ package com.oracle.DownloadSizeCheckService.service;
 
 
 import com.oracle.DownloadSizeCheckService.dto.ComplexResourcesDto;
-import com.oracle.DownloadSizeCheckService.dto.SingleResourcesDto;
-import com.oracle.DownloadSizeCheckService.exception.NotFoundHeaderValueException;
+import com.oracle.DownloadSizeCheckService.exception.HeaderValueNotFoundException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.pmw.tinylog.Logger;
@@ -38,13 +37,6 @@ public class ResourcesSizeServiceImpl implements ResourcesSizeService {
     }
 
     @Override
-    public SingleResourcesDto getSingleResourcesSize(String path) {
-        SingleResourcesDto dto = new SingleResourcesDto();
-        dto.setSize(getResourcesSize(path));
-        return dto;
-    }
-
-    @Override
     public ComplexResourcesDto getComplexResourcesSize(String path) {
         ComplexResourcesDto dto = new ComplexResourcesDto();
         dto.setRequestCount(1);
@@ -54,30 +46,32 @@ public class ResourcesSizeServiceImpl implements ResourcesSizeService {
         try {
             document = Jsoup.connect(path).get();
         } catch (IOException e) {
-            Logger.error(e.getMessage());
-            return dto;
+            Logger.error("Request does not contains Content-Length header!");
+            throw new HeaderValueNotFoundException();
         }
 
-        List<String> imageLinks = getImageLinks(document);
-        setSizeImages(dto, imageLinks);
+        setSizeImages(dto, document);
         return dto;
     }
+
 
     private Long getResourcesSize(String path) {
         HttpEntity entity = new HttpEntity(requestHeaders);
         HttpEntity<String> response = restTemplate.exchange(path, HttpMethod.HEAD, entity, String.class);
-
         HttpHeaders responseHeaders = response.getHeaders();
         List<String> contentLengthHeaders = responseHeaders.get("Content-Length");
         if (contentLengthHeaders == null) {
             Logger.error("Request does not contains Content-Length header!");
-            throw new NotFoundHeaderValueException(path);
+            throw new HeaderValueNotFoundException();
         } else {
             return Long.valueOf(contentLengthHeaders.get(0));
         }
     }
 
-    private void setSizeImages(ComplexResourcesDto dto, List<String> imageLinks) {
+    private void setSizeImages(ComplexResourcesDto dto, Document document) {
+        List<String> imageLinks = document.select("img")
+                .stream().map(link -> link.attr("abs:src")).collect(Collectors.toList());
+
         int requestCount = dto.getRequestCount();
         long totalSize = dto.getTotalSize();
         Map<String, Long> images = new HashMap<>();
@@ -96,8 +90,5 @@ public class ResourcesSizeServiceImpl implements ResourcesSizeService {
         dto.setImages(images);
     }
 
-    private List<String> getImageLinks(Document document) {
-        return document.select("img")
-                .stream().map(link -> link.attr("abs:src")).collect(Collectors.toList());
-    }
+
 }
